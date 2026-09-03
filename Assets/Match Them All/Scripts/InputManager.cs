@@ -26,22 +26,22 @@ public class InputManager : MonoBehaviour
 
     private void HandleDrag()
     {
-        Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit ,100);
-
-        if (hit.collider == null)
+        if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100))
         {
             DeselectCurrentItem();
             return;
         }
 
-        if (hit.collider.transform.parent == null)
-            return;
+        Item item = hit.collider.GetComponentInParent<Item>();
         
-        if (!hit.collider.transform.parent.TryGetComponent(out Item item))
+        if (item == null)
         {
             DeselectCurrentItem();
             return;
         }
+        
+        if (item == currentItem)
+            return;
         
         DeselectCurrentItem();
         
