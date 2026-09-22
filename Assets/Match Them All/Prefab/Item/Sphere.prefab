@@ -73,6 +73,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3cb388ed2db1643a727bc4fce7e8f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: 1
   renderer: {fileID: 8285987157296126054}
   collider: {fileID: 6137559825568536893}
 --- !u!1 &4306718666100524603

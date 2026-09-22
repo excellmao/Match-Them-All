@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ItemSpotManager : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class ItemSpotManager : MonoBehaviour
     [Header("Settings")] 
     [SerializeField] private Vector3 itemLocalPositionOnSpot;
     [SerializeField] private Vector3 itemLocalScaleOnSpot;
+    private bool isBusy;
+
+    [Header("Data")]
+    private Dictionary<EItemName, ItemMergeData> itemMergeDataDictionnary = new Dictionary<EItemName, ItemMergeData>();
     
 
     
@@ -40,6 +45,12 @@ public class ItemSpotManager : MonoBehaviour
     
     private void OnItemClicked(Item item)
     {
+        if (isBusy)
+        {
+            Debug.LogWarning("ItemSpotsManager is busy...");
+            return;
+        }
+        
         // Free spot check
         if (!IsFreeSpotAvailable())
         {
@@ -47,12 +58,113 @@ public class ItemSpotManager : MonoBehaviour
             return;
         }
 
+        isBusy = true;
+
         HandleItemClicked(item);
     }
 
     private void HandleItemClicked(Item item)
     {
-        MoveItemToFirstFreeSpot(item);
+        if (itemMergeDataDictionnary.ContainsKey(item.ItemName))
+        {
+            HandleItemMergeDataFound(item);
+        }
+        else
+        {
+            MoveItemToFirstFreeSpot(item);
+        }
+    }
+
+    private void HandleItemMergeDataFound(Item item)
+    {
+        ItemSpot idealSpot = GetIdealSpotFor(item);
+        
+        itemMergeDataDictionnary[item.ItemName].Add(item);
+
+        TryMoveItemToIdealSpot(item, idealSpot);
+    }
+
+    private ItemSpot GetIdealSpotFor(Item item)
+    {
+        List<Item> items = itemMergeDataDictionnary[item.ItemName].items;
+        List<ItemSpot> itemSpots = new List<ItemSpot>();
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            itemSpots.Add(items[i].Spot);
+        }
+        
+        // We have a list of occupied spots but the items similar to item
+        
+        // If we only have one spot -> grab spot next to it
+        if (itemSpots.Count >= 2)
+        {
+            itemSpots.Sort((a, b) => b.transform.GetSiblingIndex().CompareTo(a.transform.GetSiblingIndex()));
+        }
+
+        int idealSpotIndex = itemSpots[0].transform.GetSiblingIndex() + 1;
+
+        return spots[idealSpotIndex];
+    }
+    
+    private void TryMoveItemToIdealSpot(Item item, ItemSpot targetSpot)
+    {
+        if (!targetSpot.IsEmpty())
+        {
+            HandleIdealSpotFull(item, targetSpot);
+            return;
+        }
+        
+        MoveItemToSpot(item, targetSpot);
+    }
+
+    private void MoveItemToSpot(Item item, ItemSpot targetSpot)
+    {
+        // 1. Turn item as a child of item spot
+        targetSpot.Populate(item);
+        
+        // 2. Scale item down, set local pos 0,0,0
+        item.transform.localPosition = itemLocalPositionOnSpot;
+        item.transform.localScale = itemLocalScaleOnSpot;
+        item.transform.localRotation = Quaternion.identity;
+        
+        // 3. Disable shadow
+        item.DisableShadows();
+        
+        // 4. Disable collider / physics
+        item.DisablePhysics();
+
+        HandleItemReachedSpot(item);
+    }
+
+    private void HandleItemReachedSpot(Item item)
+    {
+        if (itemMergeDataDictionnary[item.ItemName].CanMergeItems())
+        {
+            MergeItems(itemMergeDataDictionnary[item.ItemName]);
+        } else CheckForGameOver();
+    }
+
+    private void MergeItems(ItemMergeData itemMergeData)
+    {
+        List<Item> items = itemMergeData.items;
+        
+        // Remove ItemMergeData from dictionary
+        itemMergeDataDictionnary.Remove(itemMergeData.itemName);
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            items[i].Spot.Clear();
+            Destroy(items[i].gameObject);
+        }
+        
+        //TODO: Remove this line after moving items to left
+        isBusy = false;
+    }
+
+    private void HandleIdealSpotFull(Item item, ItemSpot targetSpot)
+    {
+        throw new NotImplementedException();
     }
 
     private void MoveItemToFirstFreeSpot(Item item)
@@ -64,6 +176,8 @@ public class ItemSpotManager : MonoBehaviour
             Debug.LogError("Target spot is null => This should not happen");
             return;
         }
+
+        CreateItemMergeData(item);
         
         // 1. Turn item as a child of item spot
         targetSpot.Populate(item);
@@ -78,6 +192,30 @@ public class ItemSpotManager : MonoBehaviour
         
         // 4. Disable collider / physics
         item.DisablePhysics();
+
+        HandleFirstItemReachedSpot(item);
+    }
+
+    private void HandleFirstItemReachedSpot(Item item)
+    {
+        CheckForGameOver();
+    }
+
+    private void CheckForGameOver()
+    {
+        if (GetFreeSpot() == null)
+        {
+            Debug.LogWarning("Gameover :(");
+        }
+        else
+        {
+            isBusy = false;
+        }
+    }
+
+    private void CreateItemMergeData(Item item)
+    {
+        itemMergeDataDictionnary.Add(item.ItemName, new ItemMergeData(item));
     }
 
     private void StoreSpots()
