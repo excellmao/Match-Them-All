@@ -135,8 +135,6 @@ public class ItemSpotManager : MonoBehaviour
         item.DisablePhysics();
 
         completeCallback?.Invoke();
-        
-        // HandleItemReachedSpot(item, checkForMerge);
     }
 
     private void HandleItemReachedSpot(Item item, bool checkForMerge = true)
