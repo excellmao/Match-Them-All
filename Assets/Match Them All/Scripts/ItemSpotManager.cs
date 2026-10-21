@@ -2,6 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Rendering;
 
 public class ItemSpotManager : MonoBehaviour
 {
@@ -16,7 +17,12 @@ public class ItemSpotManager : MonoBehaviour
 
     [Header("Data")]
     private Dictionary<EItemName, ItemMergeData> itemMergeDataDictionnary = new Dictionary<EItemName, ItemMergeData>();
+
+    [Header("Animation Settings")] 
+    [SerializeField] private float animationDuration;
+    [SerializeField] private LeanTweenType animationEasing;
     
+
 
     
     private void Awake()
@@ -124,21 +130,28 @@ public class ItemSpotManager : MonoBehaviour
         targetSpot.Populate(item);
         
         // 2. Scale item down, set local pos 0,0,0
-        item.transform.localPosition = itemLocalPositionOnSpot;
-        item.transform.localScale = itemLocalScaleOnSpot;
-        item.transform.localRotation = Quaternion.identity;
+        //item.transform.localPosition = itemLocalPositionOnSpot;
+        //item.transform.localScale = itemLocalScaleOnSpot;
+        //item.transform.localRotation = Quaternion.identity;
+        
+        LeanTween.moveLocal(item.gameObject, itemLocalPositionOnSpot, animationDuration)
+            .setEase(animationEasing);
+        LeanTween.scale(item.gameObject, itemLocalScaleOnSpot, animationDuration)
+            .setEase(animationEasing);
+        LeanTween.rotateLocal(item.gameObject, Vector3.zero, animationDuration)
+            .setOnComplete(completeCallback);
         
         // 3. Disable shadow
         item.DisableShadows();
         
         // 4. Disable collider / physics
         item.DisablePhysics();
-
-        completeCallback?.Invoke();
     }
 
     private void HandleItemReachedSpot(Item item, bool checkForMerge = true)
     {
+        item.Spot.BumpDown();
+        
         if(!checkForMerge)
             return;
         
@@ -161,11 +174,16 @@ public class ItemSpotManager : MonoBehaviour
             Destroy(items[i].gameObject);
         }
 
-        MoveAllItemsToTheLeft();
+        if (itemMergeDataDictionnary.Count <= 0)
+            isBusy = false;
+        else
+            MoveAllItemsToTheLeft(HandleAllItemsMovedToTheLeft); 
     }
 
-    private void MoveAllItemsToTheLeft()
+    private void MoveAllItemsToTheLeft(Action completeCallback)
     {
+        bool callbackTriggered = false;
+        
         for (int i = 3; i < spots.Length; i++)
         {
             ItemSpot spot = spots[i];
@@ -186,11 +204,15 @@ public class ItemSpotManager : MonoBehaviour
             }
             
             spot.Clear();
-            
-            MoveItemToSpot(item, targetSpot, () => HandleItemReachedSpot(item, false));
-        }
 
-        HandleAllItemsMovedToTheLeft();
+            completeCallback += () => HandleItemReachedSpot(item, false);
+            MoveItemToSpot(item, targetSpot, completeCallback);
+
+            callbackTriggered = true;
+        }
+        
+        if (!callbackTriggered)
+            completeCallback!.Invoke();
     }
 
     private void HandleAllItemsMovedToTheLeft()
@@ -268,6 +290,8 @@ public class ItemSpotManager : MonoBehaviour
 
     private void HandleFirstItemReachedSpot(Item item)
     {
+        item.Spot.BumpDown();
+        
         CheckForGameOver();
     }
 

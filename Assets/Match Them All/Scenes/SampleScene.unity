@@ -1256,6 +1256,8 @@ MonoBehaviour:
   itemSpotsParent: {fileID: 999577976}
   itemLocalPositionOnSpot: {x: 0, y: 0.09, z: 0}
   itemLocalScaleOnSpot: {x: 0.25, y: 0.25, z: 0.25}
+  animationDuration: 0.15
+  animationEasing: 7
 --- !u!4 &1733477688 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2388620061022830489, guid: 843bcdb530433e14c85e0b7182723b25, type: 3}
