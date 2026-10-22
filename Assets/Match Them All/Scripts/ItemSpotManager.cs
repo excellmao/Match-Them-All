@@ -21,6 +21,10 @@ public class ItemSpotManager : MonoBehaviour
     [Header("Animation Settings")] 
     [SerializeField] private float animationDuration;
     [SerializeField] private LeanTweenType animationEasing;
+
+    [Header("Actions")] 
+    public static Action<List<Item>> mergeStarted;
+
     
 
 
@@ -35,18 +39,6 @@ public class ItemSpotManager : MonoBehaviour
     private void OnDestroy()
     {
         InputManager.itemClicked -= OnItemClicked;
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
     
     private void OnItemClicked(Item item)
@@ -169,15 +161,14 @@ public class ItemSpotManager : MonoBehaviour
         itemMergeDataDictionnary.Remove(itemMergeData.itemName);
 
         for (int i = 0; i < items.Count; i++)
-        {
             items[i].Spot.Clear();
-            Destroy(items[i].gameObject);
-        }
 
         if (itemMergeDataDictionnary.Count <= 0)
             isBusy = false;
         else
             MoveAllItemsToTheLeft(HandleAllItemsMovedToTheLeft); 
+        
+        mergeStarted?.Invoke(items);
     }
 
     private void MoveAllItemsToTheLeft(Action completeCallback)
