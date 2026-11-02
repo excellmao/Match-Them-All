@@ -24,10 +24,8 @@ public class ItemSpotManager : MonoBehaviour
 
     [Header("Actions")] 
     public static Action<List<Item>> mergeStarted;
-
+    public static Action<Item> itemPickedUp;
     
-
-
     
     private void Awake()
     {
@@ -57,6 +55,8 @@ public class ItemSpotManager : MonoBehaviour
         }
 
         isBusy = true;
+
+        itemPickedUp?.Invoke(item);
 
         HandleItemClicked(item);
     }
