@@ -86,6 +86,7 @@ GameObject:
   - component: {fileID: 7649238680282795373}
   - component: {fileID: 6898490301363936958}
   - component: {fileID: 5568679212369282205}
+  - component: {fileID: 8708440496666013860}
   m_Layer: 0
   m_Name: Goal Card
   m_TagString: Untagged
@@ -115,7 +116,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 145.1, y: 0}
+  m_SizeDelta: {x: 145.1, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6898490301363936958
 MonoBehaviour:
@@ -149,7 +150,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3c351f9e4d6017438d3bf21a41801c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  iconImage: {fileID: 186597891333340456}
   amountText: {fileID: 177896596086594372}
+  checkmark: {fileID: 3644573252396900577}
+  backface: {fileID: 5771500216767944620}
+  animator: {fileID: 8708440496666013860}
+--- !u!95 &8708440496666013860
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3693256483958575007}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 9d2a502d896f9dc438d8c14dfe7a9389, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &4684955569339237647
 GameObject:
   m_ObjectHideFlags: 0

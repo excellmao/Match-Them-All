@@ -181,5 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a3cb388ed2db1643a727bc4fce7e8f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  itemName: 0
+  icon: {fileID: 21300000, guid: 0cb5922824f30f149b4c0b0c3edac698, type: 3}
   renderer: {fileID: 3293379312260867301}
   collider: {fileID: 7132257950382102161}
