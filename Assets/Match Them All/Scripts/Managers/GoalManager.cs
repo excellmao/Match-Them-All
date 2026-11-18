@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GoalManager : MonoBehaviour
 {
+    public static GoalManager instance;
+    
     [Header("Elements")] 
     [SerializeField] private Transform goalCardParent;
     [SerializeField] private GoalCard goalCardPrefab;
@@ -13,17 +15,25 @@ public class GoalManager : MonoBehaviour
     [Header("Data")] 
     private ItemLevelData[] goals;
     private List<GoalCard> goalCards = new List<GoalCard>();
+    public ItemLevelData[] Goals => goals;
     
     private void Awake()
     {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
+        
         LevelManager.levelSpawned += OnLevelSpawned;
         ItemSpotManager.itemPickedUp += OnItemPickedUp;
+        PowerupManager.itemPickedup += OnItemPickedUp;
     }
 
     private void OnDestroy()
     {
         LevelManager.levelSpawned -= OnLevelSpawned;
         ItemSpotManager.itemPickedUp -= OnItemPickedUp;
+        PowerupManager.itemPickedup -= OnItemPickedUp;
     }
 
     private void OnLevelSpawned(Level level)
@@ -89,6 +99,6 @@ public class GoalManager : MonoBehaviour
                 return;
         }
         
-        Debug.Log("Level Complete");
+        GameManager.instance.SetGameState(EGameState.LEVELCOMPLETE);
     }
 }

@@ -5,9 +5,11 @@ using System.Xml;
 public class InputManager : MonoBehaviour
 {
     public static Action<Item> itemClicked;
+    public static Action<Powerup> powerupClicked;
 
     [Header("Settings")] 
     [SerializeField] private Material outlineMaterial;
+    [SerializeField] private LayerMask powerupLayer;
     private Item currentItem;
     
 
@@ -18,10 +20,28 @@ public class InputManager : MonoBehaviour
     
     void Update()
     {
+        if (GameManager.instance.IsGame())
+            HandleControl();
+    }
+
+    private void HandleControl()
+    {
+        if (Input.GetMouseButtonDown(0))
+            HandelMouseDown();
         if (Input.GetMouseButton(0))
             HandleDrag();
         else if (Input.GetMouseButtonUp(0))
             HandleMouseUp();
+    }
+
+    private void HandelMouseDown()
+    {
+        Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 100, powerupLayer);
+        
+        if(hit.collider == null)
+            return;
+
+        powerupClicked?.Invoke(hit.collider.GetComponent<Powerup>());
     }
 
     private void HandleDrag()

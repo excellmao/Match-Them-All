@@ -5,17 +5,13 @@ public class Level : MonoBehaviour
     [Header("Elements")] 
     [SerializeField] private ItemPlacer itemPlacer;
 
-    public ItemLevelData[] GetGoals() => itemPlacer.GetGoals();
+    [Header("Settings")] [SerializeField] private int duration;
+    public int Duration => duration;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public ItemLevelData[] GetGoals() => itemPlacer.GetGoals();
 
-    // Update is called once per frame
-    void Update()
+    public Item[] GetItems()
     {
-        
+        return itemPlacer.GetItems();
     }
 }

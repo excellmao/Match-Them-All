@@ -290,7 +290,7 @@ public class ItemSpotManager : MonoBehaviour
     {
         if (GetFreeSpot() == null)
         {
-            Debug.LogWarning("Gameover :(");
+            GameManager.instance.SetGameState(EGameState.GAMEOVER);
         }
         else
         {
